@@ -1,0 +1,25 @@
+{
+  "name": "@heraclius/backend-identity",
+  "version": "1.0.0",
+  "private": "true",
+  "description": "主要涵盖用户、角色和权限的相关功能与实现",
+  "type": "module",
+  "scripts": {
+    "build": "pipenv run pyinstaller main.py -y",
+    "start": "pipenv run uvicorn main:app --port 10003 --reload",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@heraclius/backend-bridge": "^1.1.0",
+    "@heraclius/external-deps-plugin": "^1.1.0",
+    "@heraclius/http-test": "^1.1.0",
+    "@types/node": "^20.14.11",
+    "unplugin-swc": "^1.5.1",
+    "vite": "^5.3.4",
+    "vite-plugin-dts": "^3.9.1",
+    "vitest": "^2.0.3"
+  },
+  "peerDependencies": {
+    "@heraclius/backend-bridge": "^1.0.0"
+  }
+}
