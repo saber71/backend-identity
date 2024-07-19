@@ -7,7 +7,8 @@
   "scripts": {
     "build": "pipenv run pyinstaller main.py -y",
     "start": "pipenv run uvicorn main:app --port 10003 --reload",
-    "test": "vitest run"
+    "test": "vitest run",
+    "pipenv-update": "pipenv run pipenv update"
   },
   "devDependencies": {
     "@heraclius/backend-bridge": "^1.1.0",
