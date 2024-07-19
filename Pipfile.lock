@@ -35,11 +35,11 @@
         },
         "backend-storage": {
             "hashes": [
-                "sha256:1821655cf4141b6f30800a9c81a7313094f8e8931165001ee07c7d59d3ccf27b",
-                "sha256:2d47abc14bdffd6ded0c4eadd5c5f0be7349beb5055137f000f18b8675ca7656"
+                "sha256:c55aa00cacd47afe0c688dd5891f1f73870b92ace700a428940cbbc37c695306",
+                "sha256:ceed3f203e639583143c59bf52233bf75934b9a7b252ffb1ccd49bb34e1a9805"
             ],
             "index": "pypi",
-            "version": "==1.1.1"
+            "version": "==1.2.0"
         },
         "certifi": {
             "hashes": [

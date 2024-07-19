@@ -1,6 +1,6 @@
+import storage
 from fastapi import APIRouter
 
-# 导入数据库模块，用于后续数据库操作
 import database
 
 # 初始化API路由器，并设置路由前缀为"/database"
@@ -23,4 +23,5 @@ def memory():
     # 将数据库的路径设置为":memory:", 以启用内存数据库
     # 这种配置通常用于测试和开发环境，而不是生产环境
     database.option["path"] = ":memory:"
+    storage.set_default_collection_type("memory")
     return "ok"
