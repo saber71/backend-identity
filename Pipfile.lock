@@ -33,6 +33,14 @@
             "markers": "python_version >= '3.8'",
             "version": "==4.4.0"
         },
+        "backend-bridge": {
+                    "hashes": [
+                        "sha256:998adea51c173a2708bed8abc57c14de311b359de6dc381defde5244bc7d709b",
+                        "sha256:c29c6c1a1b706f8261beb969171f43dec6e94772ea1dda3251f32555329c5fb9"
+                    ],
+                    "index": "pypi",
+                    "version": "==1.0.0"
+        },
         "backend-storage": {
             "hashes": [
                 "sha256:1ee0a7090c6898a4ba1c68cd3730024303f1614c1d8fabf767927ab77289e225",

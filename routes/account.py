@@ -2,8 +2,8 @@ import datetime
 import uuid
 from typing import Optional
 
+import bridge
 import fastapi
-import requests
 import storage
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -46,7 +46,7 @@ def create(data: CreateAccount):
         )
         # 将账户实体添加到数据库会话中，准备插入数据库
         session.add(account)
-        requests.post("/auth/save", data={"id": account.id, "password": data.password})
+        bridge.post("/auth/save", data={"id": account.id, "password": data.password})
         ctx.save(
             {
                 "name": constants.STORAGE_ACCOUNT_PROPERTIES_NAME,
@@ -71,5 +71,5 @@ def delete(id: str):
     """
     with database.begin() as session, storage.TransactionContext() as ctx:
         session.query(Account).filter_by(id=id).delete()
-        requests.post("/auth/delete", params={"id": id})
+        bridge.post("/auth/delete", params={"id": id})
         ctx.delete({"name": constants.STORAGE_ACCOUNT_PROPERTIES_NAME, "id": id})

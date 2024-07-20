@@ -8,6 +8,7 @@ sqlalchemy = "*"
 backend-storage = "*"
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
+backend-bridge = "*"
 
 [dev-packages]
 
