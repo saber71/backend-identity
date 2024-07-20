@@ -1,14 +1,16 @@
-from sqlalchemy import String, DateTime
-from sqlalchemy.orm import mapped_column
+import uuid
+
+from sqlalchemy import String, Integer, ForeignKey
+from sqlalchemy.orm import mapped_column, relationship
 
 import database
 
 
 # 账号
-class Account(database.Base):
+class Account(database.Base, database.TimestampMixin):
     __tablename__ = "account"
 
-    id = mapped_column(String, primary_key=True)
+    id = mapped_column(String, primary_key=True, default=uuid.uuid4())
     name = mapped_column(String, nullable=False, unique=True, comment="账号名")
-    create_time = mapped_column(DateTime, comment="创建时间")
-    update_time = mapped_column(DateTime, comment="更新时间")
+    role_id = mapped_column(Integer, ForeignKey("role.id"), comment="角色id")
+    role = relationship("Role", back_populates="accounts")

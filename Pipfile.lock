@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "29423b181321d84207decd9ef7e270f9f743ecfa8901858b3a1adb90f4858798"
+            "sha256": "195971f6ec90a875e1782cfdc8d20b8711ccc4b951faf64a22616e044a8eb778"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -34,20 +34,20 @@
             "version": "==4.4.0"
         },
         "backend-bridge": {
-                    "hashes": [
-                        "sha256:998adea51c173a2708bed8abc57c14de311b359de6dc381defde5244bc7d709b",
-                        "sha256:c29c6c1a1b706f8261beb969171f43dec6e94772ea1dda3251f32555329c5fb9"
-                    ],
-                    "index": "pypi",
-                    "version": "==1.0.0"
+            "hashes": [
+                "sha256:6e2ae86be4f740ee11e698f7c691e385090e8b216bc68f1fc7c94e3ec63f64a6",
+                "sha256:adf06722cbf054015f463fb1825d706bfc180e108ee33112b4fe06b72c4a6ab3"
+            ],
+            "index": "pypi",
+            "version": "==1.4.0"
         },
         "backend-storage": {
             "hashes": [
-                "sha256:1ee0a7090c6898a4ba1c68cd3730024303f1614c1d8fabf767927ab77289e225",
-                "sha256:53421bfba8a6661fabfa9043583a0a4a20ca490eb9e52002a6e902c80897c193"
+                "sha256:3296d4f34232037141253743f5523326acbef174085a372a9169ffab4bfcc5c7",
+                "sha256:db6b6d9bafe6bace97cf0645598c8da7fa62222c732b4a75e4f899b00acd0e3d"
             ],
             "index": "pypi",
-            "version": "==1.3.1"
+            "version": "==1.4.1"
         },
         "certifi": {
             "hashes": [
@@ -617,6 +617,14 @@
             ],
             "markers": "python_version >= '3.8'",
             "version": "==2.32.3"
+        },
+        "requests-toolbelt": {
+            "hashes": [
+                "sha256:7681a0a3d047012b5bdc0ee37d7f8f07ebe76ab08caeccfc3921ce23c88d5bc6",
+                "sha256:cccfdd665f0a24fcf4726e690f65639d272bb0637b9b92dfd91a5568ccf6bd06"
+            ],
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+            "version": "==1.0.0"
         },
         "rich": {
             "hashes": [

@@ -1,25 +1,36 @@
-import datetime
-import uuid
 from typing import Optional
 
 import bridge
 import fastapi
 import storage
 from fastapi import APIRouter
+from fastapi import Response
 from pydantic import BaseModel
 
 import constants
 import database
-from database import Account
+from database import Account, Role
 
 router = APIRouter(prefix="/account")
 
 
-# 用于表示创建账户时的请求数据
-class CreateAccount(BaseModel):
+# 验证账号的请求数据
+class VerifyAccount(BaseModel):
     name: str  # 账户名称
     password: str  # 账户密码
+
+
+# 用于表示创建账户时的请求数据
+class CreateAccount(VerifyAccount):
+    role_id: int  # 角色id
     properties: Optional[dict]  # 保存账户的额外属性，如年龄、性别等
+
+
+# 账户的详细数据
+class AccountDetail(BaseModel, Account):
+    role: Role  # 对应的角色
+    properties: Optional[dict]  # 保存账户的额外属性，如年龄、性别等
+    pass
 
 
 # 定义创建账户的API路由
@@ -30,23 +41,20 @@ def create(data: CreateAccount):
 
     使用提供的账户名称和密码创建一个账户实体，并将其存储在数据库中。
     同时，将其他属性存储在持久化存储中。
+    返回新建账号的id
 
     参数:
     - data: CreateAccount类型的实例，包含账户名称和密码。
     """
     if data.properties and "id" in data.properties:
         raise fastapi.HTTPException(status_code=422, detail="properties中不能包含有id")
+
     with database.begin() as session, storage.TransactionContext() as ctx:
-        # 创建一个新的账户实体
-        account = Account(
-            id=str(uuid.uuid4()),
-            name=data.name,
-            update_time=datetime.datetime.now(),
-            create_time=datetime.datetime.now(),
-        )
-        # 将账户实体添加到数据库会话中，准备插入数据库
+        role = session.query(Role).filter_by(id=data.role_id).first()
+        bridge.assert_not_none(role, detail=f"找不到[{data.role_id}]该角色")
+        # 创建一个新的账户实体和对应角色映射
+        account = Account(name=data.name, role_id=data.role_id)
         session.add(account)
-        bridge.post("/auth/save", data={"id": account.id, "password": data.password})
         ctx.save(
             {
                 "name": constants.STORAGE_ACCOUNT_PROPERTIES_NAME,
@@ -55,6 +63,9 @@ def create(data: CreateAccount):
                 ],
             }
         )
+        bridge.post("/auth/save", data={"id": account.id, "password": data.password})
+
+    return Response(account.id, media_type="text/plain")
 
 
 # 定义删除账户的API路由
@@ -73,3 +84,48 @@ def delete(id: str):
         session.query(Account).filter_by(id=id).delete()
         bridge.post("/auth/delete", params={"id": id})
         ctx.delete({"name": constants.STORAGE_ACCOUNT_PROPERTIES_NAME, "id": id})
+
+    return "ok"
+
+
+@router.post("/verify")
+def verify(data: VerifyAccount):
+    """
+    用户身份验证。
+
+    该函数通过接收一个包含用户名和密码的数据对象，验证用户身份并在响应头设置认证令牌。
+
+    :param data: 类型为AuthAccount的实例，包含用户名和密码。
+    :raises fastapi.HTTPException: 如果账号不存在或认证失败，则抛出HTTP异常。
+    """
+    # 初始化数据库会话
+    session = database.session()
+    # 尝试根据用户名查询账号信息
+    account = session.query(Account).filter_by(name=data.name).first()
+    # 如果账号不存在，则抛出未认证异常
+    bridge.assert_not_none(account, detail="账号不存在", status_code=401)
+    # 调用远程服务验证用户名和密码
+    res = bridge.post(
+        "/auth/verify", json={"id": account.id, "password": data.password}
+    )
+    # 检查验证结果，如果失败则抛出异常
+    bridge.check_res(res)
+    # 调用远程服务生成JWT令牌
+    res = bridge.post("/auth/jwt/encode", json={"account_id": account.id})
+    # 检查令牌生成结果，如果失败则抛出异常
+    bridge.check_res(res)
+    # 返回生成的JWT令牌
+    return Response("ok", headers={"Authorization": res.text})
+
+
+@router.get("/get")
+def get(id: str):
+    session = database.session()
+    account = session.query(Account).filter_by(id=id).first()
+    bridge.assert_not_none(
+        account,
+        detail="账号不存在",
+    )
+    res = storage.get({"name": constants.STORAGE_ACCOUNT_PROPERTIES_NAME, "id": id})
+    account_detail = bridge.assign(AccountDetail(), account, {"properties": res.json()})
+    return account_detail

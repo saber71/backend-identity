@@ -1,23 +1,19 @@
-from sqlalchemy import String, ForeignKey, UniqueConstraint, DateTime
+from sqlalchemy import ForeignKey, Integer
 from sqlalchemy.orm import mapped_column
 
-from database import Base
+from database import Base, TimestampMixin
 
 
-# 角色权限关联表
-class RolePermissions(Base):
+# 角色权限关联类，用于定义角色与权限之间的映射关系
+class RolePermissions(Base, TimestampMixin):
+    # 表名
     __tablename__ = "role_permissions"
 
-    id = mapped_column(String, primary_key=True, autoincrement=True)
-    role_id = mapped_column(String, ForeignKey("role.id"), comment="角色id")
-    permission_id = mapped_column(
-        String,
-        ForeignKey("permission.id"),
-        comment="权限id",
+    # 关联角色表的外键，标识角色id
+    role_id = mapped_column(
+        Integer, ForeignKey("role.id"), comment="角色id", primary_key=True
     )
-    update_time = mapped_column(DateTime, comment="更新时间")
-    create_time = mapped_column(DateTime, comment="创建时间")
-
-    __table_args__ = UniqueConstraint(
-        "role_id", "permission_id", name="unique_role_permission"
+    # 关联权限表的外键，标识权限id
+    permission_id = mapped_column(
+        Integer, ForeignKey("permission.id"), comment="权限id", primary_key=True
     )

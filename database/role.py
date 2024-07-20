@@ -1,14 +1,16 @@
-from sqlalchemy import String, DateTime
-from sqlalchemy.orm import mapped_column
+from sqlalchemy import String, Integer
+from sqlalchemy.orm import mapped_column, relationship
 
-from database import Base
+from database import Base, TimestampMixin
 
 
 # 角色
-class Role(Base):
+class Role(Base, TimestampMixin):
     __tablename__ = "role"
-    id = mapped_column(String, primary_key=True, autoincrement=True)
+    id = mapped_column(Integer, primary_key=True, autoincrement=True)
     name = mapped_column(String, nullable=False, comment="角色名")
-    description = mapped_column(String, comment="角色描述")
-    create_time = mapped_column(DateTime, comment="创建时间")
-    update_time = mapped_column(DateTime, comment="更新时间")
+    description = mapped_column(String, comment="角色描述", default="")
+    accounts = relationship("Account", back_populates="role")
+    permissions = relationship(
+        "Permission", secondary="role_permissions", back_populates="roles"
+    )
