@@ -9,7 +9,8 @@ from pydantic import BaseModel
 
 import constants
 import database
-from database import Account, Role, Permission, RolePermissions
+import routes.permission
+from database import Account, Role, Permission
 
 router = APIRouter(prefix="/account")
 
@@ -119,6 +120,20 @@ def verify(data: VerifyAccount):
     return Response("ok", headers={"Authorization": res.text})
 
 
+@router.get("/get")
+def get(id: str):
+    # 初始化数据库会话
+    session = database.session()
+    # 根据ID查询账号信息
+    account = session.query(Account).filter_by(id=id).first()
+    # 确保账号存在，否则抛出异常
+    bridge.assert_not_none(
+        account,
+        detail="账号不存在",
+    )
+    return account
+
+
 @router.get("/detail")
 def get_detail(id: str):
     """
@@ -133,30 +148,20 @@ def get_detail(id: str):
     返回:
     - 账号详情对象，包含账号的基本信息和属性信息。
     """
-    # 初始化数据库会话
-    session = database.session()
     # 根据ID查询账号信息
-    account = session.query(Account).filter_by(id=id).first()
-    # 确保账号存在，否则抛出异常
-    bridge.assert_not_none(
-        account,
-        detail="账号不存在",
-    )
-    role = session.query(Role).filter_by(id=account.role_id).first()
-    bridge.assert_not_none(role, detail="角色不存在")
+    account = get(id)
+    role = routes.role.get(account.role_id)
     # 从存储系统中获取账号的属性信息
     res = storage.get({"name": constants.STORAGE_ACCOUNT_PROPERTIES_NAME, "id": id})
-    permissions = (
-        session.query(Permission)
-        .join(RolePermissions, RolePermissions.permission_id == Permission.id)
-        .filter(RolePermissions.role_id == account.role_id)
-        .all()
-    )
     # 将账号信息和属性信息合并，组装成账号详情对象
     account_detail = bridge.assign(
         AccountDetail(),
         account,
-        {"properties": res.json(), "role": role, "permissions": permissions},
+        {
+            "properties": res.json(),
+            "role": role,
+            "permissions": routes.permission.search(role_id=role.id),
+        },
     )
     # 返回账号详情对象
     return account_detail
